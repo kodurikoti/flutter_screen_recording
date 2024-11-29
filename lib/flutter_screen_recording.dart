@@ -67,7 +67,7 @@ class FlutterScreenRecording {
   /// for information about the parameters.
   static Future<bool> startRecordScreenAndAudio(String name,
       {int? width, int? height , required String titleNotification, required String messageNotification}) async {
-    await _maybeStartFGS(titleNotification, messageNotification);
+    // await _maybeStartFGS(titleNotification, messageNotification);
     if( width == null || height == null) {
       width = null;
       height = null;
