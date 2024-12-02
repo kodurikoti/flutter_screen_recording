@@ -215,8 +215,12 @@ class FlutterScreenRecordingPlugin(
         }
         println("startRecordScreen staticIntentData $staticIntentData staticResultCode $staticResultCode")
         if(staticIntentData==null){
-            val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
-            ActivityCompat.startActivityForResult(registrar.activity()!!, permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null)
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+               val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
+            ActivityCompat.startActivityForResult(registrar.activity()!!, permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null) 
+            }
+            
         }else{
             mMediaProjectionCallback = MediaProjectionCallback()
             mMediaProjection = mProjectionManager?.getMediaProjection(staticResultCode, staticIntentData!!)
