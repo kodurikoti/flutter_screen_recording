@@ -30,7 +30,7 @@ class FlutterScreenRecording {
       {int? width, int? height,
         required String titleNotification,
         required String messageNotification}) async {
-    await _maybeStartFGS(titleNotification, messageNotification);
+    
     if( width == null || height == null) {
       width = null;
       height = null;
@@ -38,6 +38,7 @@ class FlutterScreenRecording {
     final bool start = await _channel.invokeMethod('startRecordScreen',
         {"name": name, "audio": false, "width": width,
           "height": height});
+    await _maybeStartFGS(titleNotification, messageNotification);
     return start;
   }
 
