@@ -92,6 +92,26 @@ class FlutterScreenRecording {
     return path;
   }
 
+  static startFGSSeperately(
+      String titleNotification, String messageNotification) async {
+    if (Platform.isAndroid) {
+      await FlutterForegroundPlugin.setServiceMethodInterval(seconds: 5);
+      await FlutterForegroundPlugin.setServiceMethod(globalForegroundService);
+      return await FlutterForegroundPlugin.startForegroundService(
+        holdWakeLock: false,
+        onStarted: () async {
+          print("Foreground on Started");
+        },
+        onStopped: () {
+          print("Foreground on Stopped");
+        },
+        title: titleNotification,
+        content: messageNotification,
+        iconName: "org_thebus_foregroundserviceplugin_notificationicon",
+      );
+    }
+  }
+  
   static _maybeStartFGS(
       String titleNotification, String messageNotification) async {
     if (Platform.isAndroid) {
