@@ -215,17 +215,17 @@ class FlutterScreenRecordingPlugin(
             println(e.message)
         }
         println("startRecordScreen staticIntentData $staticIntentData staticResultCode $staticResultCode")
-        if(staticIntentData==null){
+        // if(staticIntentData==null){
             
-            val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
-            ActivityCompat.startActivityForResult(registrar.activity()!!, permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null) 
+        //     val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
+        //     ActivityCompat.startActivityForResult(registrar.activity()!!, permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null) 
             
-        }else{
+        // }else{
             mMediaProjectionCallback = MediaProjectionCallback()
             mMediaProjection = mProjectionManager?.getMediaProjection(staticResultCode, staticIntentData!!)
             mMediaProjection?.registerCallback(mMediaProjectionCallback, null)
             mVirtualDisplay = createVirtualDisplay()
-        }
+        // }
 
     }
 
