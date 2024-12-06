@@ -273,11 +273,18 @@ class FlutterScreenRecordingPlugin(
 
     inner class MediaProjectionCallback : MediaProjection.Callback() {
         override fun onStop() {
-            mMediaRecorder?.stop()
-            mMediaRecorder?.reset()
 
-            mMediaProjection = null
-            stopScreenSharing()
+            try {
+                mMediaRecorder?.stop()
+                mMediaRecorder?.reset()
+
+                mMediaProjection = null
+                stopScreenSharing()
+            } catch (e: Exception) {
+                println("Error onMethodCall StopRecordScreen")
+                println(e.message)
+            }
+
         }
     }
 
