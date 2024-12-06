@@ -135,7 +135,12 @@ class FlutterScreenRecordingPlugin(
                 val height = call.argument<Int?>("height");
                 calculeResolution(width, height);
                 initMediaRecorder();
-                mediaProjectionPermissionRequest();
+                if(staticIntentData==null){
+                    val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
+                    ActivityCompat.startActivityForResult(registrar.activity()!!, permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null)
+                }else{
+                    result.success(true)
+                }
             } catch (e: Exception) {
                 result.success("")
             }
@@ -189,10 +194,7 @@ class FlutterScreenRecordingPlugin(
     }
 
 
-    fun mediaProjectionPermissionRequest(){
-        val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
-        ActivityCompat.startActivityForResult(registrar.activity()!!, permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null)
-    }
+
 
     fun initMediaRecorder() {
         mMediaRecorder?.setVideoSource(MediaRecorder.VideoSource.SURFACE)
@@ -233,6 +235,7 @@ class FlutterScreenRecordingPlugin(
             mMediaRecorder?.start()
 
         } catch (e: IOException) {
+            _result.success(false)
             println("ERR");
             //Log.d("--INIT-RECORDER", e.message)
             println("Error startRecordScreen")
@@ -250,6 +253,7 @@ class FlutterScreenRecordingPlugin(
             mMediaProjection?.registerCallback(mMediaProjectionCallback, null)
             mVirtualDisplay = createVirtualDisplay()
          }
+        _result.success(true)
 
     }
 
