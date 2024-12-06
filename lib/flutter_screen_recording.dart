@@ -35,26 +35,12 @@ class FlutterScreenRecording {
       width = null;
       height = null;
     }
-
-    _channel.setMethodCallHandler(_handleNativeMethod);
-
     final bool start = await _channel.invokeMethod('startRecordScreen',
         {"name": name, "audio": false, "width": width,
           "height": height});
-
     return start;
   }
 
-  static Future<dynamic> _handleNativeMethod(MethodCall call)async {
-    switch (call.method){
-      case "startForegroundService":
-        await _maybeStartFGS("Mo:dus", "Screen Recording");
-        break;
-      default:
-        break;
-
-    }
-  }
   static Future<bool> startRecordScreenAgain(String name,
       {int? width, int? height,
         required String titleNotification,

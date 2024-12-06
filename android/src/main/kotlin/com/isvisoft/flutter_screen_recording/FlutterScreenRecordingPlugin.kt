@@ -3,7 +3,6 @@ package com.isvisoft.flutter_screen_recording
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Point
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.media.MediaRecorder
@@ -14,6 +13,7 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.WindowManager
 import androidx.core.app.ActivityCompat
+import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -22,6 +22,7 @@ import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.io.File
 import java.io.IOException
+import android.graphics.Point
 
 
 class FlutterScreenRecordingPlugin(
@@ -63,8 +64,6 @@ class FlutterScreenRecordingPlugin(
         if (requestCode == SCREEN_RECORD_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 //initMediaRecorder();
-                val channel = MethodChannel(registrar.messenger(), "flutter_screen_recording")
-                channel.invokeMethod("startForegroundService", true)
                 if(staticResultCode == 0 && staticIntentData == null) {
                     mMediaProjection = mProjectionManager?.getMediaProjection(resultCode, data!!)
                     staticResultCode =resultCode;
@@ -77,6 +76,7 @@ class FlutterScreenRecordingPlugin(
 
                 mMediaProjection?.registerCallback(mMediaProjectionCallback, null)
                 mVirtualDisplay = createVirtualDisplay()
+
                 _result.success(true)
                 return true
             } else {
