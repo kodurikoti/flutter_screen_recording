@@ -30,40 +30,14 @@ class FlutterScreenRecording {
       {int? width, int? height,
         required String titleNotification,
         required String messageNotification}) async {
-
-    if(Platform.isAndroid){
-      print("KOTI--MEDIAPROJECTION--START");
-      await _channel.invokeMethod('callMediaProjectionRequest',
-          {"name": name, "audio": false, "width": width,
-            "height": height});
-      print("KOTI--MEDIAPROJECTION--END");
-    }
-
-    print("KOTI--MEDIAPROJECTION--FOUREGOURND--START");
     await _maybeStartFGS(titleNotification, messageNotification);
-    print("KOTI--MEDIAPROJECTION--FOUREGOURND--END");
     if( width == null || height == null) {
       width = null;
       height = null;
     }
-
-    print("KOTI--MEDIAPROJECTION--RECORD--START");
     final bool start = await _channel.invokeMethod('startRecordScreen',
         {"name": name, "audio": false, "width": width,
           "height": height});
-    print("KOTI--MEDIAPROJECTION--RECORD--END");
-    return start;
-  }
-
-  static Future<bool> callMediaProjectionRequest(String name,
-      {int? width, int? height,
-        required String titleNotification,
-        required String messageNotification}) async {
-
-    final bool start = await _channel.invokeMethod('callMediaProjectionRequest',
-        {"name": name, "audio": false, "width": width,
-          "height": height});
-
     return start;
   }
 

@@ -3,7 +3,6 @@ package com.isvisoft.flutter_screen_recording
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Point
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.media.MediaRecorder
@@ -14,6 +13,7 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.WindowManager
 import androidx.core.app.ActivityCompat
+import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -22,6 +22,7 @@ import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.io.File
 import java.io.IOException
+import android.graphics.Point
 
 
 class FlutterScreenRecordingPlugin(
@@ -75,10 +76,8 @@ class FlutterScreenRecordingPlugin(
 
                 mMediaProjection?.registerCallback(mMediaProjectionCallback, null)
                 mVirtualDisplay = createVirtualDisplay()
-                val methodChannel = MethodChannel(registrar.messenger(), "com.pccsuk.innovation.mediaprojectioncommunication")
-                methodChannel.invokeMethod("media_projection_permission", true)
 
-//                _result.success(true)
+                _result.success(true)
                 return true
             } else {
                 _result.success(false)
@@ -92,7 +91,7 @@ class FlutterScreenRecordingPlugin(
         if (call.method == "startRecordScreen") {
             try {
                 _result = result
-               /* mMediaRecorder = MediaRecorder()
+                mMediaRecorder = MediaRecorder()
 
                 mProjectionManager = registrar.context().applicationContext.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager?
 
@@ -101,7 +100,7 @@ class FlutterScreenRecordingPlugin(
                 val width = call.argument<Int?>("width");
                 val height = call.argument<Int?>("height");
                 calculeResolution(width, height);
-                initMediaRecorder();*/
+                initMediaRecorder();
                 startRecordScreen()
                 //result.success(true)
             } catch (e: Exception) {
@@ -117,29 +116,6 @@ class FlutterScreenRecordingPlugin(
                     result.success("${storePath}${videoName}.mp4")
                 } else {
                     result.success("")
-                }
-            } catch (e: Exception) {
-                result.success("")
-            }
-
-        } else if (call.method == "callMediaProjectionRequest") {
-            try {
-                _result = result
-                mMediaRecorder = MediaRecorder()
-
-                mProjectionManager = registrar.context().applicationContext.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager?
-
-                videoName = call.argument<String?>("name")
-                recordAudio = call.argument<Boolean?>("audio")
-                val width = call.argument<Int?>("width");
-                val height = call.argument<Int?>("height");
-                calculeResolution(width, height);
-                initMediaRecorder();
-                if(staticIntentData==null){
-                    val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
-                    ActivityCompat.startActivityForResult(registrar.activity()!!, permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null)
-                }else{
-                    result.success(true)
                 }
             } catch (e: Exception) {
                 result.success("")
@@ -193,9 +169,6 @@ class FlutterScreenRecordingPlugin(
         println("$mDisplayWidth x $mDisplayHeight")
     }
 
-
-
-
     fun initMediaRecorder() {
         mMediaRecorder?.setVideoSource(MediaRecorder.VideoSource.SURFACE)
 
@@ -235,25 +208,21 @@ class FlutterScreenRecordingPlugin(
             mMediaRecorder?.start()
 
         } catch (e: IOException) {
-            _result.success(false)
             println("ERR");
             //Log.d("--INIT-RECORDER", e.message)
             println("Error startRecordScreen")
             println(e.message)
         }
         println("startRecordScreen staticIntentData $staticIntentData staticResultCode $staticResultCode")
-         if(staticIntentData==null){
-            
+        if(staticIntentData==null){
             val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
-            ActivityCompat.startActivityForResult(registrar.activity()!!, permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null) 
-            
-         }else{
+            ActivityCompat.startActivityForResult(registrar.activity()!!, permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null)
+        }else{
             mMediaProjectionCallback = MediaProjectionCallback()
             mMediaProjection = mProjectionManager?.getMediaProjection(staticResultCode, staticIntentData!!)
             mMediaProjection?.registerCallback(mMediaProjectionCallback, null)
             mVirtualDisplay = createVirtualDisplay()
-         }
-        _result.success(true)
+        }
 
     }
 
