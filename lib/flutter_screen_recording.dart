@@ -31,20 +31,25 @@ class FlutterScreenRecording {
         required String titleNotification,
         required String messageNotification}) async {
 
-    bool start = await _channel.invokeMethod('callMediaProjectionRequest',
-        {"name": name, "audio": false, "width": width,
-          "height": height});
-    if(start){
-      await _maybeStartFGS(titleNotification, messageNotification);
-      if( width == null || height == null) {
-        width = null;
-        height = null;
-      }
-      start = await _channel.invokeMethod('startRecordScreen',
+    bool start = true;
+    if(Platform.isAndroid){
+      start = await _channel.invokeMethod('callMediaProjectionRequest',
           {"name": name, "audio": false, "width": width,
             "height": height});
     }
 
+    if(start){
+      await _maybeStartFGS(titleNotification, messageNotification);
+    }
+
+    if( width == null || height == null) {
+      width = null;
+      height = null;
+    }
+
+    start = await _channel.invokeMethod('startRecordScreen',
+        {"name": name, "audio": false, "width": width,
+          "height": height});
   
     return start;
   }
