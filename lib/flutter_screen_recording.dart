@@ -33,22 +33,26 @@ class FlutterScreenRecording {
 
     bool start = true;
     if(Platform.isAndroid){
+      print("KOTI--MEDIAPROJECTION--START");
       start = await _channel.invokeMethod('callMediaProjectionRequest',
           {"name": name, "audio": false, "width": width,
             "height": height});
+      print("KOTI--MEDIAPROJECTION--END");
     }
 
+    print("KOTI--MEDIAPROJECTION--FOUREGOURND--START");
     await _maybeStartFGS(titleNotification, messageNotification);
-
+    print("KOTI--MEDIAPROJECTION--FOUREGOURND--END");
     if( width == null || height == null) {
       width = null;
       height = null;
     }
 
+    print("KOTI--MEDIAPROJECTION--RECORD--START");
     start = await _channel.invokeMethod('startRecordScreen',
         {"name": name, "audio": false, "width": width,
           "height": height});
-  
+    print("KOTI--MEDIAPROJECTION--RECORD--END");
     return start;
   }
 
