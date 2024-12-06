@@ -35,10 +35,13 @@ class FlutterScreenRecording {
       width = null;
       height = null;
     }
+
+    _channel.setMethodCallHandler(_handleNativeMethod);
+
     final bool start = await _channel.invokeMethod('startRecordScreen',
         {"name": name, "audio": false, "width": width,
           "height": height});
-    _channel.setMethodCallHandler(_handleNativeMethod);
+
     return start;
   }
 
