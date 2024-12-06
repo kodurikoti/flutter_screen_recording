@@ -38,9 +38,7 @@ class FlutterScreenRecording {
             "height": height});
     }
 
-    if(start){
-      await _maybeStartFGS(titleNotification, messageNotification);
-    }
+    await _maybeStartFGS(titleNotification, messageNotification);
 
     if( width == null || height == null) {
       width = null;
