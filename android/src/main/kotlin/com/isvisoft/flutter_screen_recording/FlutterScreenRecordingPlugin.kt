@@ -92,7 +92,7 @@ class FlutterScreenRecordingPlugin(
         if (call.method == "startRecordScreen") {
             try {
                 _result = result
-                mMediaRecorder = MediaRecorder()
+               /* mMediaRecorder = MediaRecorder()
 
                 mProjectionManager = registrar.context().applicationContext.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager?
 
@@ -101,7 +101,7 @@ class FlutterScreenRecordingPlugin(
                 val width = call.argument<Int?>("width");
                 val height = call.argument<Int?>("height");
                 calculeResolution(width, height);
-                initMediaRecorder();
+                initMediaRecorder();*/
                 startRecordScreen()
                 //result.success(true)
             } catch (e: Exception) {
@@ -118,6 +118,24 @@ class FlutterScreenRecordingPlugin(
                 } else {
                     result.success("")
                 }
+            } catch (e: Exception) {
+                result.success("")
+            }
+
+        } else if (call.method == "callMediaProjectionRequest") {
+            try {
+                _result = result
+                mMediaRecorder = MediaRecorder()
+
+                mProjectionManager = registrar.context().applicationContext.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager?
+
+                videoName = call.argument<String?>("name")
+                recordAudio = call.argument<Boolean?>("audio")
+                val width = call.argument<Int?>("width");
+                val height = call.argument<Int?>("height");
+                calculeResolution(width, height);
+                initMediaRecorder();
+                mediaProjectionPermissionRequest();
             } catch (e: Exception) {
                 result.success("")
             }
@@ -168,6 +186,12 @@ class FlutterScreenRecordingPlugin(
         //println(metrics.widthPixels.toString() + " x " + metrics.heightPixels)
         println("Calcule Resolution ")
         println("$mDisplayWidth x $mDisplayHeight")
+    }
+
+
+    fun mediaProjectionPermissionRequest(){
+        val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
+        ActivityCompat.startActivityForResult(registrar.activity()!!, permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null)
     }
 
     fun initMediaRecorder() {
