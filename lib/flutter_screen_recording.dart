@@ -69,7 +69,7 @@ class FlutterScreenRecording {
     return "";
   }
 
-  static Future<String> stopRecordScreenKeepStatic() async {
+  static Future<String> stopRecordScreenKeepService() async {
     try {
       final String path = await FlutterScreenRecordingPlatform.instance.stopRecordScreenKeepStatic;
       return path;
