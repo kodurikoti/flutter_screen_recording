@@ -1,13 +1,11 @@
-import 'dart:async';
-import 'dart:io';
-import 'dart:io';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screen_recording/flutter_screen_recording.dart';
+import 'package:quiver/async.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:open_file/open_file.dart';
-import 'package:quiver/async.dart';
 
 void main() => runApp(MyApp());
 
@@ -21,17 +19,14 @@ class _MyAppState extends State<MyApp> {
   int _time = 0;
 
   requestPermissions() async {
-    // await PermissionHandler().requestPermissions([
-    //   PermissionGroup.storage,
-    //   PermissionGroup.photos,
-    //   PermissionGroup.microphone,
-    // ]);
-
-    Map<Permission, PermissionStatus> statuses = await [
-      Permission.photos,
-      Permission.storage,
-      Permission.microphone,
-    ].request();
+    if (!kIsWeb) {
+      if (await Permission.notification.isDenied) {
+        await Permission.notification.request();
+      }
+      if (await Permission.microphone.request().isDenied) {
+        await Permission.microphone.request();
+      }
+    }
   }
 
   @override
@@ -59,11 +54,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
@@ -76,7 +66,7 @@ class _MyAppState extends State<MyApp> {
             Text('Time: $_time\n'),
             !recording
                 ? Center(
-                    child: TextButton(
+                    child: ElevatedButton(
                       child: Text("Record Screen"),
                       onPressed: () => startScreenRecord(false),
                     ),
@@ -84,13 +74,13 @@ class _MyAppState extends State<MyApp> {
                 : Container(),
             !recording
                 ? Center(
-                    child: TextButton(
+                    child: ElevatedButton(
                       child: Text("Record Screen & audio"),
                       onPressed: () => startScreenRecord(true),
                     ),
                   )
                 : Center(
-                    child: TextButton(
+                    child: ElevatedButton(
                       child: Text("Stop Record"),
                       onPressed: () => stopScreenRecord(),
                     ),
@@ -103,28 +93,23 @@ class _MyAppState extends State<MyApp> {
 
   startScreenRecord(bool audio) async {
     bool start = false;
-    await Future.delayed(const Duration(milliseconds: 1000));
 
     if (audio) {
       start = await FlutterScreenRecording.startRecordScreenAndAudio(
-          "Title" + _time.toString(),
-          titleNotification: "dsffad",
-          messageNotification: "sdffd");
+        "Title",
+        titleNotification: "titleNotification",
+        messageNotification: "messageNotification",
+      );
     } else {
-      int width, height;
-      // // Record screen at quarter size, ie file size reduced by x16
-      // Size win = window.physicalSize / 4; // Reduce size
-      // width = win.width ~/ 10 * 10; // Round to multiple of 10
-      // height = win.height ~/ 10 * 10;
-      start = await FlutterScreenRecording.startRecordScreen("Title",
-          width: width, height: height,
-          titleNotification: "dsffad", messageNotification: "sdffd",
+      start = await FlutterScreenRecording.startRecordScreen(
+        "Title",
+        titleNotification: "titleNotification",
+        messageNotification: "messageNotification",
       );
     }
 
     if (start) {
       setState(() => recording = !recording);
-      print("Recording started at $_time");
     }
 
     return start;
@@ -134,12 +119,7 @@ class _MyAppState extends State<MyApp> {
     String path = await FlutterScreenRecording.stopRecordScreen;
     setState(() {
       recording = !recording;
-      print("Recording stopped at $_time");
     });
-    File videoFile = File(path);
-    int fileSizeBytes = await videoFile.length();
-    print('Video file size $fileSizeBytes bytes');
-
     print("Opening video");
     print(path);
     OpenFile.open(path);
