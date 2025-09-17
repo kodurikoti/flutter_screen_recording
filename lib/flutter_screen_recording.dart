@@ -56,11 +56,17 @@ class FlutterScreenRecording {
   }
 
   static Future<String> get stopRecordScreen async {
-    final String path = await _channel.invokeMethod('stopRecordScreen');
-    if (Platform.isAndroid) {
-      await FlutterForegroundPlugin.stopForegroundService();
+    try {
+      final String path = await FlutterScreenRecordingPlatform.instance.stopRecordScreen;
+      if (!kIsWeb && Platform.isAndroid) {
+        FlutterForegroundTask.stopService();
+      }
+      return path;
+    } catch (err) {
+      print("stopRecordScreen err");
+      print(err);
     }
-    return path;
+    return "";
   }
 
   static Future<String> stopRecordScreenKeepStatic() async {
