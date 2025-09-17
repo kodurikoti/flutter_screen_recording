@@ -1,137 +1,116 @@
+//import 'file:D:/Workspace/flutter_screen_recording/flutter_screen_recording_platform_interface/lib/flutter_screen_recording_platform_interface.dart';
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_foreground_plugin/flutter_foreground_plugin.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_screen_recording_platform_interface/flutter_screen_recording_platform_interface.dart';
 
 class FlutterScreenRecording {
-  static const MethodChannel _channel =
-  const MethodChannel('flutter_screen_recording');
+  static Future<bool> startRecordScreen(String name, {String? titleNotification, String? messageNotification}) async {
+    try {
+      if (titleNotification == null) {
+        titleNotification = "";
+      }
+      if (messageNotification == null) {
+        messageNotification = "";
+      }
 
-  /// Records the device screen, without audio, to a video file named
-  /// [name].mp4 on the device.
-  /// The parameters [width] and [height] (in pixels) control the dimensions
-  /// of the video that
-  /// is produced, and therefore also the size of the video file. The full
-  /// screen area is always recorded.
-  /// If either [width] or [height] is null the video file will be recorded
-  /// at the full resolution of
-  /// the device screen.
-  ///
-  /// The parameters [titleNotification] and [messageNotification] are
-  /// the title and content of any notification sent to the user
-  /// by the [ForegroundService] that runs on Android while the screen is being
-  /// recorded.
-  ///
-  /// Note that on some platforms it may cause an error if the video dimensions
-  /// are not multiples of ten. See the example project for code.
-  static Future<bool> startRecordScreen(String name,
-      {int? width, int? height,
-        required String titleNotification,
-        required String messageNotification}) async {
-    // await _maybeStartFGS(titleNotification, messageNotification);
-    if( width == null || height == null) {
-      width = null;
-      height = null;
+      await _maybeStartFGS(titleNotification, messageNotification);
+      final bool start = await FlutterScreenRecordingPlatform.instance.startRecordScreen(
+        name,
+        notificationTitle: titleNotification,
+        notificationMessage: messageNotification,
+      );
+
+      return start;
+    } catch (err) {
+      print("startRecordScreen err");
+      print(err);
     }
-    final bool start = await _channel.invokeMethod('startRecordScreen',
-        {"name": name, "audio": false, "width": width,
-          "height": height});
-    return start;
+
+    return false;
   }
 
-  static Future<bool> startRecordScreenAgain(String name,
-      {int? width, int? height,
-        required String titleNotification,
-        required String messageNotification}) async {
-    // await _maybeStartFGS(titleNotification, messageNotification);
-    if( width == null || height == null) {
-      width = null;
-      height = null;
-    }
-
-    if(Platform.isAndroid) {
-      final bool start = await _channel.invokeMethod('startRecordScreen',
-          {"name": name, "audio": false, "width": width,
-            "height": height});
-      return start;
-    }else{
-      final bool start = await _channel.invokeMethod('startRecordScreenAgain', {"name": name, "audio": false});
-      return start;
-    }
-  }
-
-  /// Records the device screen, with audio, to a video file named
-  /// [name].mp4 on the device. See [FlutterScreenRecoding.startRecordScreen]
-  /// for information about the parameters.
   static Future<bool> startRecordScreenAndAudio(String name,
-      {int? width, int? height , required String titleNotification, required String messageNotification}) async {
-    // await _maybeStartFGS(titleNotification, messageNotification);
-    if( width == null || height == null) {
-      width = null;
-      height = null;
-    }
-    final bool start = await _channel
-        .invokeMethod('startRecordScreen', {"name": name, "audio": true,
-      "width": width, "height": height});
-    return start;
-  }
-
-  static Future<String> get stopRecordScreen async {
-    final String path = await _channel.invokeMethod('stopRecordScreen');
-    if (Platform.isAndroid) {
-      await FlutterForegroundPlugin.stopForegroundService();
-    }
-    return path;
-  }
-
-  static Future<String> stopRecordScreenKeepService() async {
-    final String path = await _channel.invokeMethod('stopRecordScreenKeepStatic');
-    return path;
-  }
-
-  static startFGSSeperately(
-      String titleNotification, String messageNotification) async {
-    if (Platform.isAndroid) {
-      await FlutterForegroundPlugin.setServiceMethodInterval(seconds: 5);
-      await FlutterForegroundPlugin.setServiceMethod(globalForegroundService);
-      return await FlutterForegroundPlugin.startForegroundService(
-        holdWakeLock: false,
-        onStarted: () async {
-          print("Foreground on Started");
-        },
-        onStopped: () {
-          print("Foreground on Stopped");
-        },
-        title: titleNotification,
-        content: messageNotification,
-        iconName: "org_thebus_foregroundserviceplugin_notificationicon",
+      {String? titleNotification, String? messageNotification}) async {
+    try {
+      if (titleNotification == null) {
+        titleNotification = "";
+      }
+      if (messageNotification == null) {
+        messageNotification = "";
+      }
+      await _maybeStartFGS(titleNotification, messageNotification);
+      final bool start = await FlutterScreenRecordingPlatform.instance.startRecordScreenAndAudio(
+        name,
+        notificationTitle: titleNotification,
+        notificationMessage: messageNotification,
       );
+      return start;
+    } catch (err) {
+      print("startRecordScreenAndAudio err");
+      print(err);
     }
-  }
-  
-  static _maybeStartFGS(
-      String titleNotification, String messageNotification) async {
-    if (Platform.isAndroid) {
-      await FlutterForegroundPlugin.setServiceMethodInterval(seconds: 5);
-      await FlutterForegroundPlugin.setServiceMethod(globalForegroundService);
-      return await FlutterForegroundPlugin.startForegroundService(
-        holdWakeLock: false,
-        onStarted: () async {
-          print("Foreground on Started");
-        },
-        onStopped: () {
-          print("Foreground on Stopped");
-        },
-        title: titleNotification,
-        content: messageNotification,
-        iconName: "org_thebus_foregroundserviceplugin_notificationicon",
-      );
-    }
+    return false;
   }
 
-  static void globalForegroundService() {
-    print("current datetime is ${DateTime.now()}");
+  static Future<String> stopRecordScreen({bool isStatic = false}) async {
+    try {
+      final String path = await FlutterScreenRecordingPlatform.instance.stopRecordScreen;
+      if (!kIsWeb && Platform.isAndroid) {
+        FlutterForegroundTask.stopService();
+      }
+      return path;
+    } catch (err) {
+      print("stopRecordScreen err");
+      print(err);
+    }
+    return "";
+  }
+
+  static Future<String> stopRecordScreenKeepStatic() async {
+    try {
+      final String path = await FlutterScreenRecordingPlatform.instance.stopRecordScreenKeepStatic;
+      return path;
+    } catch (err) {
+      print("stopRecordScreen err");
+      print(err);
+    }
+    return "";
+  }
+
+  static _maybeStartFGS(String titleNotification, String messageNotification) {
+    try {
+      if (!kIsWeb && Platform.isAndroid) {
+        FlutterForegroundTask.init(
+          androidNotificationOptions: AndroidNotificationOptions(
+            channelId: 'notification_channel_id',
+            channelName: titleNotification,
+            channelDescription: messageNotification,
+            channelImportance: NotificationChannelImportance.LOW,
+            priority: NotificationPriority.LOW,
+            // iconData: const NotificationIconData(
+            //   resType: ResourceType.mipmap,
+            //   resPrefix: ResourcePrefix.ic,
+            //   name: 'launcher',
+            // ),
+          ),
+          iosNotificationOptions: const IOSNotificationOptions(
+            showNotification: true,
+            playSound: false,
+          ),
+          foregroundTaskOptions: ForegroundTaskOptions(
+            // interval: 5000,
+            autoRunOnBoot: true,
+            allowWifiLock: true,
+            eventAction: ForegroundTaskEventAction.repeat(5000),
+          ),
+        );
+      }
+    } catch (err) {
+      print("_maybeStartFGS err");
+      print(err);
+    }
   }
 }
