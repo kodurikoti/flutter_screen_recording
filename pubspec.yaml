@@ -15,6 +15,7 @@ dependencies:
     git:
       url: https://github.com/kodurikoti/flutter_foreground_service_plugin.git
   ffi: ^2.0.0
+  flutter_foreground_task: ^8.1.0
   flutter_screen_recording_platform_interface:
     path: flutter_screen_recording_platform_interface
 
